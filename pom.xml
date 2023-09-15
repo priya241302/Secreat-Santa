@@ -58,5 +58,17 @@
 			</plugin>
 		</plugins>
 	</build>
+	<distributionManagement>
+  <repository>
+    <id>santa-releases</id>
+    <!-- CHANGE HERE by your team Nexus server -->
+    <url>http://52.87.226.243:8081/repository/santa-releases/</url>
+  </repository>
+  <snapshotRepository>
+    <id>santa-snapshots</id>
+    <!-- CHANGE HERE by your team Nexus server -->
+    <url>http://52.87.226.243:8081/repository/santa-snapshots/</url>
+  </snapshotRepository>
+</distributionManagement>
 
 </project>
