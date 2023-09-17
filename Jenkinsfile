@@ -59,9 +59,9 @@ pipeline {
             steps{
                script{
                          withDockerRegistry(credentialsId: 'dockerhub', toolName: 'docker') {
-                        sh "docker build -t secreatsanta ."
-                        sh "docker tag secreatsanta priya247/secreatsanta:${env.BUILD_NUMBER} "
-                        sh "docker push priya247/secreatsanta:${env.BUILD_NUMBER} "
+                        sh "docker build -t secreatsantag ."
+                        sh "docker tag secreatsantag priya247/secreatsantag:${env.BUILD_NUMBER} "
+                        sh "docker push priya247/secreatsantag:${env.BUILD_NUMBER} "
                     
                     }
                 }
@@ -70,12 +70,25 @@ pipeline {
         
     
         
-        stage('Trigger ManifestUpdate') {
-            steps{
-                echo "triggering updatemanifestjob"
-                build job: 'Updating-manifest', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
+  stage('Update Deployment File') {
+        environment {
+            GIT_REPO_NAME = "Secreat-Santa"
+            GIT_USER_NAME = "priya241302"
         }
-}
+        steps {
+            withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
+                sh '''
+                    git config user.email "haripriyapogu@gmail.com"
+                    git config user.name "priya241302"
+                    BUILD_NUMBER=${BUILD_NUMBER}
+                    sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" manifests/deploymentservice.yml
+                    git add manifests/deploymentservice.yml
+                    git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+                    git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:master
+                '''
+            }
+        }
+    }
         
        
     }
