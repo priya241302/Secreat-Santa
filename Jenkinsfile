@@ -27,6 +27,12 @@ pipeline {
             steps{
                 sh "mvn test"
             }
+            
+           post {
+        always {
+      junit(testResults: 'target/surefire-reports/*.xml', allowEmptyResults : true)
+    }
+    }
         }
          stage("Sonarqube Analysis "){
             steps{
@@ -40,7 +46,7 @@ pipeline {
         }
          
         
-         stage("OWASP Dependency Check"){
+        stage("OWASP Dependency Check"){
             steps{
                 dependencyCheck additionalArguments: '--scan ./ ' , odcInstallation: 'DP'
                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
@@ -53,24 +59,28 @@ pipeline {
                 sh " mvn clean install"
             }
         }  
+        
+        stage("Docker Build"){
+        steps{
+            sh "docker build -t secreatsanta ."
+        }
+        }
+
           
          
-       stage("Docker Build & Push"){
+       stage("Docker Push"){
             steps{
                script{
                          withDockerRegistry(credentialsId: 'dockerhub', toolName: 'docker') {
-                        sh "docker build -t secreatsantag ."
-                        sh "docker tag secreatsantag priya247/secreatsantag:${env.BUILD_NUMBER} "
-                        sh "docker push priya247/secreatsantag:${env.BUILD_NUMBER} "
+                      
+                        sh "docker tag secreatsanta priya247/secreatsanta:${env.BUILD_NUMBER} "
+                        sh "docker push priya247/secreatsanta:${env.BUILD_NUMBER} "
                     
                     }
                 }
             }
        }
-        
-    
-        
-  stage('Update Deployment File') {
+        stage('Update Deployment File') {
         environment {
             GIT_REPO_NAME = "Secreat-Santa"
             GIT_USER_NAME = "priya241302"
@@ -83,12 +93,23 @@ pipeline {
                     BUILD_NUMBER=${BUILD_NUMBER}
                     sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" manifests/deploymentservice.yml
                     git add manifests/deploymentservice.yml
+                    git add -A
                     git commit -m "Update deployment image to version ${BUILD_NUMBER}"
                     git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:master
+                    git rebase master
                 '''
             }
         }
     }
+
+    
+        
+        stage("Deploy To Kuberates Cluster"){
+        steps{
+        sh "kubectl apply -f manifests/deploymentservice.yml"
+        }
+        }
+
         
        
     }
