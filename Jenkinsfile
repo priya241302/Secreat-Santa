@@ -71,7 +71,7 @@ pipeline {
        stage("Docker Push"){
             steps{
                script{
-                         withDockerRegistry(credentialsId: 'dockerhub', toolName: 'docker') {
+                     withDockerRegistry(credentialsId: 'dockerhub', toolName: 'docker') {
                       
                         sh "docker tag secreatsanta priya247/secreatsanta:${env.BUILD_NUMBER} "
                         sh "docker push priya247/secreatsanta:${env.BUILD_NUMBER} "
@@ -105,10 +105,10 @@ pipeline {
     
         
         stage("Deploy To Kuberates Cluster"){
-        steps{
+        steps {
         sh "kubectl apply -f manifests/deploymentservice.yml"
-        }
-        }
+     }
+    }
 
         
        
