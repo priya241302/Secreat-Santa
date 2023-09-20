@@ -2,5 +2,5 @@ projectKey=Secreat-Santa
 serverUrl=http://3.95.32.15:9000
 serverVersion=9.9.2.77730
 dashboardUrl=http://3.95.32.15:9000/dashboard?id=Secreat-Santa
-ceTaskId=AYqxm7PrLBG3pF_EUB5J
-ceTaskUrl=http://3.95.32.15:9000/api/ce/task?id=AYqxm7PrLBG3pF_EUB5J
+ceTaskId=AYqxnmrCLBG3pF_EUB5K
+ceTaskUrl=http://3.95.32.15:9000/api/ce/task?id=AYqxnmrCLBG3pF_EUB5K
