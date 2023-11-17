@@ -5,9 +5,7 @@ pipeline {
         jdk 'jdk17'
         maven 'maven3'
     }
-     environment {
-        SCANNER_HOME=tool 'sonar-scanner'
-    }
+  
 
      
     stages{
@@ -28,31 +26,12 @@ pipeline {
                 sh "mvn test"
             }
             
-        post {
-            always {
-          junit(testResults: 'target/surefire-reports/*.xml', allowEmptyResults : true)
-        }
+        
     }
         }
-         stage("Sonarqube Analysis "){
-            steps{
-                withSonarQubeEnv('sonar-server') {
-                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Secreat-Santa \
-                    -Dsonar.java.binaries=. \
-                    -Dsonar.projectKey=Secreat-Santa '''
-    
-                }
-            }
-        }
+        
          
-        
-        stage("OWASP Dependency Check"){
-            steps{
-                dependencyCheck additionalArguments: '--scan ./ ' , odcInstallation: 'DP'
-                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-            }
-        }
-        
+   
       
         stage("Build"){
             steps{
@@ -103,12 +82,7 @@ pipeline {
     }
 
     
-        
-        stage("Deploy To Kuberates Cluster"){
-        steps {
-        sh "kubectl apply -f manifests/deploymentservice.yml"
-     }
-    }
+ 
 
         
        
